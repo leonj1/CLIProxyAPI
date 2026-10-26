@@ -15,7 +15,7 @@ env:
 
 jobs:
   prepare-release:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     steps:
       - uses: actions/checkout@v6
         with:
@@ -94,7 +94,7 @@ jobs:
   build-hosted:
     name: build ${{ matrix.target }}
     needs: prepare-release
-    runs-on: ${{ matrix.runner }}
+    runs-on: "${{ (matrix.runner) == 'macos-15-intel' && fromJSON('[\"self-hosted\",\"macOS\",\"x64\"]') || (matrix.runner) == 'macos-15' && fromJSON('[\"self-hosted\",\"macOS\",\"ARM64\"]') || (matrix.runner) == 'windows-latest' && fromJSON('[\"self-hosted\",\"windows\",\"x64\"]') || (matrix.runner) == 'windows-11-arm' && fromJSON('[\"self-hosted\",\"windows\",\"ARM64\"]') || (matrix.runner) }}"
     strategy:
       fail-fast: false
       matrix:
@@ -235,7 +235,7 @@ jobs:
   build-linux-glibc:
     name: build linux-${{ matrix.goarch }} glibc
     needs: prepare-release
-    runs-on: ${{ matrix.runner }}
+    runs-on: "${{ (matrix.runner) == 'ubuntu-latest' && fromJSON('[\"self-hosted\",\"linux\",\"x64\"]') || (matrix.runner) == 'ubuntu-24.04-arm' && fromJSON('[\"self-hosted\",\"linux\",\"ARM64\"]') || (matrix.runner) }}"
     strategy:
       fail-fast: false
       matrix:
@@ -371,7 +371,7 @@ jobs:
   build-linux-no-plugin:
     name: build linux-${{ matrix.goarch }} no-plugin
     needs: prepare-release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     strategy:
       fail-fast: false
       matrix:
@@ -490,7 +490,7 @@ jobs:
   build-freebsd:
     name: build ${{ matrix.target }}
     needs: prepare-release
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     env:
       TARGET: ${{ matrix.target }}
       TARGET_GOARCH: ${{ matrix.goarch }}
@@ -689,7 +689,7 @@ jobs:
           gh release upload "$GITHUB_REF_NAME" "$tmp_dir/checksums.txt" --clobber
 
   publish-checksums:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, x64]
     if: always()
     needs:
       - build-hosted
